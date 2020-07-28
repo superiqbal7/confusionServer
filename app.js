@@ -14,8 +14,11 @@ const mongoose = require('mongoose');
 
 const Dishes = require('./models/dishes.js')
 
-const url = 'mongodb://localhost:27018/conFusion';
-const connect = mongoose.connect(url);
+const url = 'mongodb://localhost:27017/conFusion';
+const connect = mongoose.connect(url, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 connect.then((db)=>{
   console.log('connected correctly to server');
