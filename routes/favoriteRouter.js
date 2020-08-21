@@ -92,15 +92,28 @@ favRouter.route('/:dishId')
   }) 
   // GET
   .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
-    Favorites.findById(req.params.dishId)
-      .populate('user')
-      .populate('dish')
-      .then((Favorites) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(Favorites);
+    Favorites.findOne({ user: req.user._id })
+      .then((favorites) => {
+        if (!favorites) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          return res.json({ "exists": false, "favorites": favorites });
+        }
+        else {
+          if (favorites.dishes.indexOf(req.params.dishId) < 0) {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            return res.json({ "exists": false, "favorites": favorites });
+          }
+          else {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            return res.json({ "exists": true, "favorites": favorites });
+          }
+        }
+
       }, (err) => next(err))
-      .catch((err) => next(err));
+      .catch((err) => next(err))
   })
   // handles POST to /leaders/:leaderId
   .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
